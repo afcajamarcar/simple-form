@@ -1,9 +1,52 @@
+// Variables
+$simple-form-magenta: magenta;
+
+// Style definitions
 .App {
+    // best way to center content in middle of screen
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    
     .justify {
         margin-bottom: 25px;
+    }
+
+    .clean-drag-n-drop {
+        display: inline;
+        text-align: center;
+        border: dashed;
+        border-width: thin;
+        padding: 10px;
+
+        .click-here {
+            color: $simple-form-magenta;
+        }
+    }
+
+    .drag-n-drop {
+        display: flex;
+        border: dashed;
+        border-width: thin;
+        padding: 10px;
+
+        p, img {
+            width: 50%;
+            height: 50%;
+            margin: auto;
+            word-wrap: anywhere;
+            cursor: pointer;   
+        }
+
+        .click-here {
+            color: $simple-form-magenta;
+        }
+
+        .image-name {
+            text-align: center;
+            margin: auto;
+            color: $simple-form-magenta;
+        }
     }
 }
