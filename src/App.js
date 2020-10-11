@@ -105,12 +105,14 @@ function App() {
       assignmentError: assignmentError,
       courseError: courseError
     })
+    return Object.keys(studentErrors).some(error => studentErrors[error].isError);
   }
 
   const handleSubmit = (e) => {
     console.log('handling sumbmit');
     e.preventDefault(); // Prevent submit behavior to keep a single source of truth
-    validateAll();
+    if(!validateAll()) return;
+    console.log('send data to firebase');
   };
 
   return (
