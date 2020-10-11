@@ -19,6 +19,7 @@ $simple-form-magenta: magenta;
         border: dashed;
         border-width: thin;
         padding: 10px;
+        cursor: pointer;
 
         .click-here {
             color: $simple-form-magenta;
@@ -35,8 +36,7 @@ $simple-form-magenta: magenta;
             width: 50%;
             height: 50%;
             margin: auto;
-            word-wrap: anywhere;
-            cursor: pointer;   
+            word-wrap: anywhere;   
         }
 
         .click-here {
@@ -47,6 +47,27 @@ $simple-form-magenta: magenta;
             text-align: center;
             margin: auto;
             color: $simple-form-magenta;
+        }
+    }
+
+    .wipe-drag-n-drop {
+        color: maroon;
+        padding-top: 20px;
+        margin: auto;
+        cursor: pointer;
+        display: flex;
+
+        &:hover {
+            opacity: 0.5;
+        }
+
+        .trash-icon {
+            margin-top: 5px;
+        }
+
+        .delete-text {
+            margin: auto;
+            padding: 8px;
         }
     }
 }

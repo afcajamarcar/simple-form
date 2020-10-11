@@ -3,6 +3,7 @@ import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone'
 import { FormControl, FormGroup, InputLabel, Input, Button } from '@material-ui/core';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 function App() {
   console.log('rendering...');
@@ -39,7 +40,7 @@ function App() {
 
     if (!doesDragHaveFiles) {
       console.log('drag mark as occupied');
-      setDoesDragHaveFiles(true)
+      setDoesDragHaveFiles(true);
     };
 
     reader.addEventListener('load', () => {
@@ -50,8 +51,15 @@ function App() {
     }, false);
   }, [studentInfo, doesDragHaveFiles]);
 
-
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
+
+  const clearDragndropZone = () => {
+    setStudentInfo({
+      ...studentInfo,
+      image: { encoded: '', name: ''}
+    });
+    setDoesDragHaveFiles(false);
+  };
 
   return (
     <div className="App">
@@ -87,7 +95,6 @@ function App() {
               <p>
                 Imagen seleccionada
                 <br/>
-                <br/>
                 <div className="image-name-container">
                   <span className="image-name">
                     {studentInfo.image.name}
@@ -96,6 +103,12 @@ function App() {
               </p>
               <img src={studentInfo.image.encoded} alt={studentInfo.image.name} />
             </div>}
+            {doesDragHaveFiles &&
+              <div className="wipe-drag-n-drop" onClick={() => clearDragndropZone()}>
+                <DeleteIcon className="trash-icon" />
+                <div className="delete-text">Eliminar imagen</div> 
+              </div>
+            }
 
         </FormControl>
         <Button variant="contained" color="primary">Guardar</Button>
