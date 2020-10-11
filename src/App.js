@@ -61,9 +61,13 @@ function App() {
     setDoesDragHaveFiles(false);
   };
 
+  const isAbleToSave = studentInfo.name && studentInfo.code && 
+    studentInfo.help && studentInfo.assignment &&
+    studentInfo.course && studentInfo.image.encoded;
+
   return (
     <div className="App">
-      <FormGroup>
+      <FormGroup className="form-container">
         <FormControl className="justify">
           <InputLabel htmlFor="student-name" >Nombre completo</InputLabel>
           <Input type="text" name="name" id="student-name" onChange={e => handleChange(e)} />
@@ -105,9 +109,8 @@ function App() {
               <div className="delete-text">Eliminar imagen</div>
             </div>
           }
-
         </FormControl>
-        <Button variant="contained" color="primary">Guardar</Button>
+        <Button disabled={!isAbleToSave} variant="contained" color="primary">Guardar</Button>
       </FormGroup>
     </div>
   );
