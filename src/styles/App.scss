@@ -32,11 +32,10 @@ $simple-form-magenta: magenta;
         border-width: thin;
         padding: 10px;
 
-        p, img {
+        .image-name-container, img {
             width: 50%;
             height: 50%;
             margin: auto;
-            word-wrap: anywhere;   
         }
 
         .click-here {
@@ -47,6 +46,7 @@ $simple-form-magenta: magenta;
             text-align: center;
             margin: auto;
             color: $simple-form-magenta;
+            word-wrap: anywhere;
         }
     }
 

@@ -56,7 +56,7 @@ function App() {
   const clearDragndropZone = () => {
     setStudentInfo({
       ...studentInfo,
-      image: { encoded: '', name: ''}
+      image: { encoded: '', name: '' }
     });
     setDoesDragHaveFiles(false);
   };
@@ -92,23 +92,19 @@ function App() {
               <p>Arrastra la imagen de tu carné o <span className="click-here">haz click</span> para elegir un archivo</p>
             </div> :
             <div className="drag-n-drop">
-              <p>
-                Imagen seleccionada
-                <br/>
-                <div className="image-name-container">
-                  <span className="image-name">
-                    {studentInfo.image.name}
-                  </span>
-                </div>
-              </p>
+              <div className="image-name-container">
+                <span className="image-name">
+                  {studentInfo.image.name}
+                </span>
+              </div>
               <img src={studentInfo.image.encoded} alt={studentInfo.image.name} />
             </div>}
-            {doesDragHaveFiles &&
-              <div className="wipe-drag-n-drop" onClick={() => clearDragndropZone()}>
-                <DeleteIcon className="trash-icon" />
-                <div className="delete-text">Eliminar imagen</div> 
-              </div>
-            }
+          {doesDragHaveFiles &&
+            <div className="wipe-drag-n-drop" onClick={() => clearDragndropZone()}>
+              <DeleteIcon className="trash-icon" />
+              <div className="delete-text">Eliminar imagen</div>
+            </div>
+          }
 
         </FormControl>
         <Button variant="contained" color="primary">Guardar</Button>
