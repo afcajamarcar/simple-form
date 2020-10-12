@@ -1,12 +1,18 @@
 import './styles/App.scss';
+import "firebase/firestore";
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone'
-import { FormControl, FormGroup, InputLabel, Input, Button, FormHelperText } from '@material-ui/core';
+import {
+  FormControl, FormGroup, InputLabel, Input,
+  Button, FormHelperText, Dialog, DialogContent, CircularProgress
+} from '@material-ui/core';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import DeleteIcon from '@material-ui/icons/Delete';
+import firebaseApp from './firebase';
 
 function App() {
-  console.log('rendering...');
+  const ref = firebaseApp.firestore().collection("students");
+
   let [studentInfo, setStudentInfo] = useState({
     name: '',
     code: '',
@@ -27,6 +33,8 @@ function App() {
 
   let [doesDragHaveFiles, setDoesDragHaveFiles] = useState(false);
 
+  let [open, setOpen] = useState(false);
+
   const handleChange = e => {
     setStudentInfo({
       ...studentInfo,
@@ -38,8 +46,8 @@ function App() {
     console.log('drop received');
     console.log(image);
 
-    if (!image[0].type.includes('png') || image[0].type.includes('jpg') ||
-      image[0].type.includes('jpeg')) {
+    if (image[0].type !== 'image/png' && image[0].type !== 'image/jpg' &&
+      image[0].type !== 'image/jpeg') {
       setStudentErrors({
         ...studentErrors,
         imageError: { isError: true, message: "Solo se permiten archivos de tipo jpg, png o jpeg" }
@@ -105,48 +113,76 @@ function App() {
       assignmentError: assignmentError,
       courseError: courseError
     })
-    return Object.keys(studentErrors).some(error => studentErrors[error].isError);
+    console.log('studentErrors', studentErrors);
+    let errors = [nameError, codeError, helpError, assignmentError, courseError];
+    return Object.keys(errors).some(error => errors[error].isError);
   }
 
   const handleSubmit = (e) => {
     console.log('handling sumbmit');
     e.preventDefault(); // Prevent submit behavior to keep a single source of truth
-    if(!validateAll()) return;
+    if (validateAll()) {
+      console.log('problem with validation');
+      return;
+    };
     console.log('send data to firebase');
+    setOpen(true);
+    ref.add(studentInfo)
+      .then(docRef => {
+        console.log("Document written with ID: ", docRef.id)
+        setOpen(false);
+        setStudentInfo({
+          name: '',
+          code: '',
+          help: '',
+          assignment: '',
+          course: '',
+          image: { encoded: '', name: '' }
+        })
+        setDoesDragHaveFiles(false);
+      })
+      .catch(error => {
+        console.error("Error adding document: ", error)
+        setOpen(false);
+      });
   };
+
+  const handleClose = () => {
+    setOpen(false);
+  }
 
   return (
     <div className="App">
       <FormGroup className="form-container">
         <FormControl className="justify" error={studentErrors.nameError.isError}>
           <InputLabel htmlFor="student-name" >Nombre completo</InputLabel>
-          <Input type="text" name="name" id="student-name" onChange={e => handleChange(e)} />
+          <Input type="text" name="name" id="student-name" value={studentInfo.name} onChange={e => handleChange(e)} />
           <FormHelperText id="name-error-text">{studentErrors.nameError.message}</FormHelperText>
         </FormControl>
         <FormControl className="justify" error={studentErrors.codeError.isError}>
           <InputLabel htmlFor="student-code" >Código</InputLabel>
-          <Input type="text" name="code" id="student-code" onChange={e => handleChange(e)} />
+          <Input type="text" name="code" id="student-code" value={studentInfo.code} onChange={e => handleChange(e)} />
           <FormHelperText id="name-error-text">{studentErrors.codeError.message}</FormHelperText>
         </FormControl>
         <FormControl className="justify" error={studentErrors.helpError.isError}>
           <InputLabel htmlFor="student-help" >Ayuda de interés</InputLabel>
-          <Input type="text" id="student-help" name="help" onChange={e => handleChange(e)} />
+          <Input type="text" id="student-help" name="help" value={studentInfo.help} onChange={e => handleChange(e)} />
           <FormHelperText id="name-error-text">{studentErrors.helpError.message}</FormHelperText>
         </FormControl>
         <FormControl className="justify" error={studentErrors.assignmentError.isError}>
           <InputLabel htmlFor="student-assignment" >Asignatura</InputLabel>
-          <Input type="text" id="student-assignment" name="assignment" onChange={e => handleChange(e)} />
+          <Input type="text" id="student-assignment" name="assignment" value={studentInfo.assignment} onChange={e => handleChange(e)} />
           <FormHelperText id="name-error-text">{studentErrors.assignmentError.message}</FormHelperText>
         </FormControl>
         <FormControl className="justify" error={studentErrors.courseError.isError}>
           <InputLabel htmlFor="student-course" >Grupo</InputLabel>
-          <Input type="text" id="student-course" name="course" onChange={e => handleChange(e)} />
+          <Input type="text" id="student-course" name="course" value={studentInfo.course} onChange={e => handleChange(e)} />
           <FormHelperText id="name-error-text">{studentErrors.courseError.message}</FormHelperText>
         </FormControl>
         <FormControl className="justify" error={studentErrors.imageError.isError}>
           {!doesDragHaveFiles ?
             <div {...getRootProps()} className="clean-drag-n-drop">
-              <input {...getInputProps()} />
+              <input {...getInputProps()} accept=".png,.jpg,.jpeg" />
               <GetAppIcon />
               <p>Arrastra la imagen de tu carné o <span className="click-here">haz click</span> para elegir un archivo</p>
             </div> :
@@ -168,6 +204,20 @@ function App() {
         </FormControl>
         <Button onClick={e => handleSubmit(e)} disabled={!isAbleToSave} variant="contained" color="primary">Guardar</Button>
       </FormGroup>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        disableBackdropClick
+        disableEscapeKeyDown
+
+      >
+        <DialogContent>
+          <div className="loader-container">
+            <CircularProgress />
+          </div>
+          <p>Guardando la información...</p>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
