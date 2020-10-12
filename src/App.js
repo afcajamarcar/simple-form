@@ -4,11 +4,17 @@ import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone'
 import {
   FormControl, FormGroup, InputLabel, Input,
-  Button, FormHelperText, Dialog, DialogContent, CircularProgress
+  Button, FormHelperText, Dialog, DialogContent, 
+  CircularProgress, Snackbar
 } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import DeleteIcon from '@material-ui/icons/Delete';
 import firebaseApp from './firebase';
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function App() {
   const ref = firebaseApp.firestore().collection("students");
@@ -33,7 +39,11 @@ function App() {
 
   let [doesDragHaveFiles, setDoesDragHaveFiles] = useState(false);
 
-  let [open, setOpen] = useState(false);
+  let [openDialog, setOpenDialog] = useState(false);
+
+  let [openAlert, setOpenAlert] = useState(false);
+
+  let [openAlertError, setOpenAlertError] = useState(false);
 
   const handleChange = e => {
     setStudentInfo({
@@ -126,11 +136,12 @@ function App() {
       return;
     };
     console.log('send data to firebase');
-    setOpen(true);
+    setOpenDialog(true);
     ref.add(studentInfo)
       .then(docRef => {
         console.log("Document written with ID: ", docRef.id)
-        setOpen(false);
+        setOpenDialog(false);
+        setOpenAlert(true);
         setStudentInfo({
           name: '',
           code: '',
@@ -143,12 +154,21 @@ function App() {
       })
       .catch(error => {
         console.error("Error adding document: ", error)
-        setOpen(false);
+        setOpenDialog(false);
+        setOpenAlertError(true);
       });
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setOpenDialog(false);
+  }
+
+  const handleAlertClose = () => {
+    setOpenAlert(false);
+  }
+
+  const handleAlertErrorClose = () => {
+    setOpenAlertError(false);
   }
 
   return (
@@ -205,7 +225,7 @@ function App() {
         <Button onClick={e => handleSubmit(e)} disabled={!isAbleToSave} variant="contained" color="primary">Guardar</Button>
       </FormGroup>
       <Dialog
-        open={open}
+        open={openDialog}
         onClose={handleClose}
         disableBackdropClick
         disableEscapeKeyDown
@@ -218,6 +238,16 @@ function App() {
           <p>Guardando la información...</p>
         </DialogContent>
       </Dialog>
+      <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleAlertClose}>
+        <Alert onClose={handleAlertClose} severity="success">
+          ¡Se han guardado los datos exitosamente!
+        </Alert>
+      </Snackbar>
+      <Snackbar open={openAlertError} autoHideDuration={6000} onClose={handleAlertErrorClose}>
+        <Alert onClose={handleAlertErrorClose} severity="error">
+          ¡Ha ocurrido un error al intentar guardar los datos!
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
