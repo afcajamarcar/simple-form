@@ -4,28 +4,28 @@ import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone'
 import {
   FormControl, FormGroup, InputLabel, Input,
-  Button, FormHelperText, Dialog, DialogContent, 
+  Button, FormHelperText, Dialog, DialogContent,
   CircularProgress, Snackbar
 } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import DeleteIcon from '@material-ui/icons/Delete';
-import firebaseApp from './firebase';
+import { db } from './firebase';
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 function App() {
-  const ref = firebaseApp.firestore().collection("students");
-
   let [studentInfo, setStudentInfo] = useState({
     name: '',
     code: '',
     help: '',
     assignment: '',
     course: '',
-    image: { encoded: '', name: '' }
+    image: { encoded: '', name: '' },
+    currentDate: new Date(),
+    status: "nuevo"
   });
 
   let [studentErrors, setStudentErrors] = useState({
@@ -137,9 +137,24 @@ function App() {
     };
     console.log('send data to firebase');
     setOpenDialog(true);
-    ref.add(studentInfo)
-      .then(docRef => {
-        console.log("Document written with ID: ", docRef.id)
+    let { name, code, help, assignment, course, image, currentDate, status } = studentInfo;
+    let timestamp = new Date();
+    db.ref(`prestamos/${timestamp}`).set({
+      nombre: name,
+      codigo: code,
+      ayuda: help,
+      asignatura: assignment,
+      curso: course,
+      imagen: image,
+      fechaPrestamo: currentDate,
+      estado: status,
+    }, (error) => {
+      if (error) {
+        console.error("Error adding document: ", error)
+        setOpenDialog(false);
+        setOpenAlertError(true);
+      } else {
+        console.log("Document written successfuly");
         setOpenDialog(false);
         setOpenAlert(true);
         setStudentInfo({
@@ -151,12 +166,8 @@ function App() {
           image: { encoded: '', name: '' }
         })
         setDoesDragHaveFiles(false);
-      })
-      .catch(error => {
-        console.error("Error adding document: ", error)
-        setOpenDialog(false);
-        setOpenAlertError(true);
-      });
+      }
+    });
   };
 
   const handleClose = () => {
@@ -199,6 +210,17 @@ function App() {
           <Input type="text" id="student-course" name="course" value={studentInfo.course} onChange={e => handleChange(e)} />
           <FormHelperText id="name-error-text">{studentErrors.courseError.message}</FormHelperText>
         </FormControl>
+        <FormControl className="justify">
+          <InputLabel htmlFor="loan-date" >Fecha del préstamo</InputLabel>
+          <Input
+            id="loan-date"
+            label="Fecha del préstamo"
+            type="date"
+            name="currentDate"
+            value={studentInfo.date}
+            onChange={e => handleChange(e)}
+          />
+        </FormControl>
         <FormControl className="justify" error={studentErrors.imageError.isError}>
           {!doesDragHaveFiles ?
             <div {...getRootProps()} className="clean-drag-n-drop">
@@ -229,7 +251,6 @@ function App() {
         onClose={handleClose}
         disableBackdropClick
         disableEscapeKeyDown
-
       >
         <DialogContent>
           <div className="loader-container">
