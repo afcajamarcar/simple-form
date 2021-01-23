@@ -113,7 +113,7 @@ function App() {
     if (!studentInfo.name || studentInfo.name.length < 10) nameError = { isError: true, message: 'El nombre debe tener al menos 10 caracteres' }
     if (!studentInfo.code || studentInfo.code.length < 8) codeError = { isError: true, message: 'El código debe tener al menos 8 caracteres' }
     if (!studentInfo.help || studentInfo.help.length < 5) helpError = { isError: true, message: 'La ayuda debe tener al menos 5 caracteres' }
-    if (!studentInfo.assignment || studentInfo.assignment.length < 5) assignmentError = { isError: true, message: 'La asignatura debe tener al menos 5 caracteres' }
+    if (!studentInfo.assignment || studentInfo.assignment.length < 3) assignmentError = { isError: true, message: 'La asignatura debe tener al menos 5 caracteres' }
     if (!studentInfo.course) courseError = { isError: true, message: 'El curso no puede estar vacío' }
     setStudentErrors({
       ...studentErrors,
