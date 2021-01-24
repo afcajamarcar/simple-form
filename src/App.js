@@ -163,7 +163,17 @@ function App() {
           help: '',
           assignment: '',
           course: '',
-          image: { encoded: '', name: '' }
+          image: { encoded: '', name: '' },
+          currentDate: new Date(),
+          status: "nuevo"
+        })
+        setStudentErrors({
+          nameError: { isError: false, message: '' },
+          codeError: { isError: false, message: '' },
+          helpError: { isError: false, message: '' },
+          assignmentError: { isError: false, message: '' },
+          courseError: { isError: false, message: '' },
+          imageError: { isError: false, message: '' }
         })
         setDoesDragHaveFiles(false);
       }
